@@ -37,13 +37,15 @@
 #define SCREEN_HEIGHT 240
 
 #define ID_TEX_MARIO 0
-#define ID_TEX_ENEMY 10
+#define ID_TEX_ENEMY_R 10
+#define ID_TEX_ENEMY_L 11
 #define ID_TEX_MISC 20
 
 #define TEXTURES_DIR L"textures"
 #define TEXTURE_PATH_MARIO TEXTURES_DIR "\\mario.png"
 #define TEXTURE_PATH_MISC TEXTURES_DIR "\\misc_transparent.png"
-#define TEXTURE_PATH_ENEMIES TEXTURES_DIR "\\enemies.png"
+#define TEXTURE_PATH_ENEMIES_RtL TEXTURES_DIR "\\enemiesRtL.png"
+#define TEXTURE_PATH_ENEMIES_LtR TEXTURES_DIR "\\enemiesLtR.png"
 
 CMario *mario;
 #define MARIO_START_X 10.0f
@@ -53,6 +55,13 @@ CMario *mario;
 CBrick *brick;
 
 CGlassBrick* gbrick;
+
+CCoin* coin;
+
+CClubba* clubba;
+#define CLUBBA_START_X 300.0f
+#define CLUBBA_START_Y 150.0f
+#define CLUBBA_START_VX 0.1f
 
 LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -77,6 +86,8 @@ void LoadResources()
 
 	textures->Add(ID_TEX_MARIO, TEXTURE_PATH_MARIO);
 	//textures->Add(ID_ENEMY_TEXTURE, TEXTURE_PATH_ENEMIES, D3DCOLOR_XRGB(156, 219, 239));
+	textures->Add(ID_TEX_ENEMY_R, TEXTURE_PATH_ENEMIES_RtL);
+	textures->Add(ID_TEX_ENEMY_L, TEXTURE_PATH_ENEMIES_LtR);
 	textures->Add(ID_TEX_MISC, TEXTURE_PATH_MISC);
 
 
@@ -140,11 +151,49 @@ void LoadResources()
 	ani->Add(30003);
 	ani->Add(30004);
 	animations->Add(520, ani);
+
+
+	//Coin...
+	sprites->Add(40001, 300, 171, 315, 186, texMisc);
+	sprites->Add(40002, 300, 99, 315, 115, texMisc);
+	sprites->Add(40003, 318, 99, 335, 115, texMisc);
+	sprites->Add(40004, 336, 99, 353, 115, texMisc);
+
+	ani = new CAnimation(100);
+	ani->Add(40001, 100);	//id , time
+	ani->Add(40002);
+	ani->Add(40003);
+	ani->Add(40004);
+	animations->Add(530, ani);
+
+	//Clubba...
+	LPTEXTURE texEnemyL = textures->Get(ID_TEX_ENEMY_L);
+	LPTEXTURE texEnemyR = textures->Get(ID_TEX_ENEMY_R);
+
+	sprites->Add(50001, 436, 129, 451, 155, texEnemyL);
+	sprites->Add(50002, 458, 130, 473, 155, texEnemyL);
+
+	sprites->Add(50011, 6, 130, 21, 155, texEnemyR);
+	sprites->Add(50012, 28, 129, 43, 155, texEnemyR);
+
+	ani = new CAnimation(100);
+	ani->Add(50001,500);
+	ani->Add(50002,500);
+	animations->Add(540, ani);
+
+
+
+	ani = new CAnimation(100);
+	ani->Add(50011,500);
+	ani->Add(50012,500);
+	animations->Add(541, ani);
 	
 	
 	mario = new CMario(MARIO_START_X, MARIO_START_Y, MARIO_START_VX);
 	brick = new CBrick(100.0f, 100.0f);
 	gbrick = new CGlassBrick(200.0f, 100.0f);
+	coin = new CCoin(250.0f, 100.0f);
+	clubba = new CClubba(CLUBBA_START_X, CLUBBA_START_Y, CLUBBA_START_VX);
 }
 
 /*
@@ -154,6 +203,7 @@ void LoadResources()
 void Update(DWORD dt)
 {
 	mario->Update(dt);
+	clubba->Update(dt);
 }
 
 void Render()
@@ -178,7 +228,10 @@ void Render()
 
 		brick->Render();
 		gbrick->Render();
+		coin->Render();
+
 		mario->Render();
+		clubba->Render();
 
 		// Uncomment this line to see how to draw a porttion of a texture  
 		//g->Draw(10, 10, texMisc, 300, 117, 316, 133);

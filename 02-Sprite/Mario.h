@@ -31,4 +31,21 @@ public:
 	void Render();
 };
 
+class CCoin : public CGameObject {
+public:
+	CCoin(float x, float y) : CGameObject(x, y) {}
+	void Update(DWORD dt) {}
+	void Render();
+};
+
+class CClubba : public CGameObject
+{
+protected:
+	float vx;
+public:
+	CClubba(float x, float y, float vx);
+	void Update(DWORD dt);
+	void Render();
+};
+
 
