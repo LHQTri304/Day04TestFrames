@@ -52,6 +52,8 @@ CMario *mario;
 
 CBrick *brick;
 
+CGlassBrick* gbrick;
+
 LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message) {
@@ -80,6 +82,7 @@ void LoadResources()
 
 	CSprites * sprites = CSprites::GetInstance();
 	
+	//Mario...
 	LPTEXTURE texMario = textures->Get(ID_TEX_MARIO);
 
 	// readline => id, left, top, right 
@@ -110,7 +113,7 @@ void LoadResources()
 	animations->Add(501, ani);
 
 
-
+	//Question brick...
 	LPTEXTURE texMisc = textures->Get(ID_TEX_MISC);
 	sprites->Add(20001, 300, 117, 317, 133, texMisc);
 	sprites->Add(20002, 318, 117, 335, 133, texMisc);
@@ -123,10 +126,25 @@ void LoadResources()
 	ani->Add(20003);
 	ani->Add(20004);
 	animations->Add(510, ani);
+
+
+	//Glass brick...
+	sprites->Add(30001, 300, 135, 317, 151, texMisc);
+	sprites->Add(30002, 318, 135, 335, 151, texMisc);
+	sprites->Add(30003, 336, 135, 353, 151, texMisc);
+	sprites->Add(30004, 354, 135, 371, 151, texMisc);
+
+	ani = new CAnimation(100);
+	ani->Add(30001, 1000);	//id , time
+	ani->Add(30002);
+	ani->Add(30003);
+	ani->Add(30004);
+	animations->Add(520, ani);
 	
 	
 	mario = new CMario(MARIO_START_X, MARIO_START_Y, MARIO_START_VX);
 	brick = new CBrick(100.0f, 100.0f);
+	gbrick = new CGlassBrick(200.0f, 100.0f);
 }
 
 /*
@@ -159,6 +177,7 @@ void Render()
 		pD3DDevice->OMSetBlendState(g->GetAlphaBlending(), NewBlendFactor, 0xffffffff);
 
 		brick->Render();
+		gbrick->Render();
 		mario->Render();
 
 		// Uncomment this line to see how to draw a porttion of a texture  

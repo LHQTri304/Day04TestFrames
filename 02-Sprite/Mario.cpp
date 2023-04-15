@@ -44,3 +44,11 @@ void CBrick::Render() {
 	ani->Render(x, y);
 
 }
+
+void CGlassBrick::Render() {
+
+	LPANIMATION ani = CAnimations::GetInstance()->Get(520);
+
+	ani->Render(x, y);
+
+}
