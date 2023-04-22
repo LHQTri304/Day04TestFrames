@@ -58,13 +58,6 @@ void CGlassBrick::Render() {
 
 }
 
-//*CCoin
-void CCoin::Update(DWORD dt)
-{
-	if (y <= 0)
-		y = COIN_START_Y;
-}
-
 void CCoin::Render() {
 
 	LPANIMATION ani = CAnimations::GetInstance()->Get(530);
@@ -89,7 +82,7 @@ void CClubba::Update(DWORD dt)
 		vx = -vx;
 
 		y -= DISTANCE_BRICK_ROWS;
-		if (y <= 0)
+		if (y <= 67)	//The highest place is the movable Clubba which is 68
 			y = CLUBBA_START_Y;
 
 		if (x <= 0)

@@ -50,13 +50,12 @@
 CMario *mario;
 #define MARIO_RADIUS 8.0f
 #define MARIO_START_X 10.0f
-#define MARIO_START_Y 13.0f
+#define MARIO_START_Y 68.0f
 #define MARIO_START_VX 0.3f
-float RandMarioSpawnY[4] = {
+float RandMarioSpawnY[3] = {
 	MARIO_START_Y,
 	MARIO_START_Y + DISTANCE_BRICK_ROWS,
-	MARIO_START_Y + DISTANCE_BRICK_ROWS * 2,
-	MARIO_START_Y + DISTANCE_BRICK_ROWS * 3 };
+	MARIO_START_Y + DISTANCE_BRICK_ROWS * 2};
 
 CBrick *brick;
 
@@ -70,7 +69,7 @@ CGlassBrick* gbrick;
 CCoin* coin;
 #define COIN_RADIUS 8.0f
 #define COIN_START_X SCREEN_WIDTH/2
-#define COIN_START_Y 13.0f
+#define COIN_START_Y 68.0f
 #define NUM_OF_COINS 20
 
 CClubba* clubba;
@@ -84,7 +83,6 @@ CDoor* doors;
 vector<CGlassBrick*> gbricks1;
 vector<CGlassBrick*> gbricks2;
 vector<CGlassBrick*> gbricks3;
-vector<CGlassBrick*> gbricks4;
 
 vector<CCoin*> coins;
 
@@ -100,7 +98,7 @@ int CheckCollideObject(CGameObject* Obj1, CGameObject* Obj2)
 void CollideMarioCoin(CGameObject* mario, CGameObject* coin)
 {
 	float RandCoinSpawnX = (rand() % (SCREEN_WIDTH - 20) + 10);
-	int SpawnIndex = (rand() % 4);
+	int SpawnIndex = (rand() % 3);
 
 	if (CheckCollideObject(mario, coin))
 		coin->SetPosition(RandCoinSpawnX, RandMarioSpawnY[SpawnIndex]);	//use mario's for convenience
@@ -108,7 +106,7 @@ void CollideMarioCoin(CGameObject* mario, CGameObject* coin)
 
 void CollideMarioClubba(CGameObject* mario, CGameObject* clubba)
 {
-	int SpawnIndex = (rand() % 4);
+	int SpawnIndex = (rand() % 3);
 
 	if (CheckCollideObject(mario, clubba))
 		mario->SetPosition(MARIO_START_X, RandMarioSpawnY[SpawnIndex]);
@@ -270,7 +268,6 @@ void LoadResources()
 		gbricks1.push_back(new CGlassBrick(nextBrickX, GBRICK_Y, 0));
 		gbricks2.push_back(new CGlassBrick(nextBrickX, GBRICK_Y - DISTANCE_BRICK_ROWS, 0));
 		gbricks3.push_back(new CGlassBrick(nextBrickX, GBRICK_Y - DISTANCE_BRICK_ROWS * 2, 0));
-		gbricks4.push_back(new CGlassBrick(nextBrickX, GBRICK_Y - DISTANCE_BRICK_ROWS * 3, 0));
 		nextBrickX += GBRICK_WIDTH;
 	}
 
@@ -342,7 +339,6 @@ void Render()
 			gbricks1[i]->Render();
 			gbricks2[i]->Render();
 			gbricks3[i]->Render();
-			gbricks4[i]->Render();
 		}
 
 
