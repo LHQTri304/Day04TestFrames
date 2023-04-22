@@ -48,15 +48,24 @@
 #define TEXTURE_PATH_ENEMIES_LtR TEXTURES_DIR "\\enemiesLtR.png"
 
 CMario *mario;
+#define MARIO_RADIUS 8.0f
 #define MARIO_START_X 10.0f
-#define MARIO_START_Y 130.0f
-#define MARIO_START_VX 0.1f
+#define MARIO_START_Y 178.0f
+#define MARIO_START_VX 0.3f
 
 CBrick *brick;
 
 CGlassBrick* gbrick;
+#define GBRICK_X 0.0f
+#define GBRICK_Y 200.0f
+#define GBRICK_WIDTH 16
+#define NUM_OF_BRICKS 20
+#define DISTANCE_BRICK_ROWS	55
 
 CCoin* coin;
+#define COIN_RADIUS 8.0f
+#define COIN_START_X SCREEN_WIDTH/2
+#define COIN_START_Y 178.0f
 
 CClubba* clubba;
 #define CLUBBA_START_X 300.0f
@@ -65,6 +74,24 @@ CClubba* clubba;
 
 CDoor* doors;
 #define DOOR_SPRITE_HEIGHT 16.0f
+
+vector<CGlassBrick*> gbricks1;
+vector<CGlassBrick*> gbricks2;
+vector<CGlassBrick*> gbricks3;
+vector<CGlassBrick*> gbricks4;
+
+//Check collide function
+int CheckCollideObject(CGameObject* Obj1, CGameObject* Obj2)
+{
+	float RandCoinSpawnX = (rand() % (SCREEN_WIDTH-20) + 10);
+
+	if (abs(Obj1->GetX() - Obj2->GetX()) <= Obj1->GetR() + Obj2->GetR()
+		&& abs(Obj1->GetY() - Obj2->GetY()) <= Obj1->GetR() + Obj2->GetR())
+	{
+		Obj2->SetPosition(RandCoinSpawnX, Obj2->GetY() - DISTANCE_BRICK_ROWS);
+	}
+	return 0;
+}
 
 LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -215,13 +242,24 @@ void LoadResources()
 	animations2->Add(100, ani2);
 
 	
+	//Row of bricks...
+	float nextBrickX = GBRICK_X;
+	for (int i = 0; i <= NUM_OF_BRICKS; i++)
+	{
+		gbricks1.push_back(new CGlassBrick(nextBrickX, GBRICK_Y, 0));
+		gbricks2.push_back(new CGlassBrick(nextBrickX, GBRICK_Y - DISTANCE_BRICK_ROWS, 0));
+		gbricks3.push_back(new CGlassBrick(nextBrickX, GBRICK_Y - DISTANCE_BRICK_ROWS * 2, 0));
+		gbricks4.push_back(new CGlassBrick(nextBrickX, GBRICK_Y - DISTANCE_BRICK_ROWS * 3, 0));
+		nextBrickX += GBRICK_WIDTH;
+	}
 	
-	mario = new CMario(MARIO_START_X, MARIO_START_Y, MARIO_START_VX);
-	brick = new CBrick(100.0f, 100.0f);
-	gbrick = new CGlassBrick(200.0f, 100.0f);
-	coin = new CCoin(250.0f, 100.0f);
-	clubba = new CClubba(CLUBBA_START_X, CLUBBA_START_Y, CLUBBA_START_VX);
-	doors = new CDoor(280.0f, 100.0f, DOOR_SPRITE_HEIGHT);
+
+	mario = new CMario(MARIO_START_X, MARIO_START_Y, MARIO_RADIUS, MARIO_START_VX);
+	brick = new CBrick(100.0f, 100.0f, 0);
+	gbrick = new CGlassBrick(200.0f, 100.0f, 0);
+	coin = new CCoin(COIN_START_X, COIN_START_Y, COIN_RADIUS);
+	clubba = new CClubba(CLUBBA_START_X, CLUBBA_START_Y, 0, CLUBBA_START_VX);
+	doors = new CDoor(280.0f, 100.0f, DOOR_SPRITE_HEIGHT, 0);
 }
 
 /*
@@ -231,6 +269,8 @@ void LoadResources()
 void Update(DWORD dt)
 {
 	mario->Update(dt);
+	coin->Update(dt);
+	CheckCollideObject(mario, coin);
 	clubba->Update(dt);
 }
 
@@ -256,12 +296,20 @@ void Render()
 
 		//brick->Render();
 		//gbrick->Render();
-		//coin->Render();
+		coin->Render();
 
-		//mario->Render();
+		mario->Render();
 		//clubba->Render();
 
 		//doors->Render();
+
+		for (int i = 0; i < NUM_OF_BRICKS; i++)
+		{
+			gbricks1[i]->Render();
+			gbricks2[i]->Render();
+			gbricks3[i]->Render();
+			gbricks4[i]->Render();
+		}
 
 		// Uncomment this line to see how to draw a porttion of a texture  
 		//g->Draw(10, 10, texMisc, 300, 117, 316, 133);

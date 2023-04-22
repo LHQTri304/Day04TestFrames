@@ -1,7 +1,7 @@
 #include "Game.h"
 #include "Mario.h"
 
-CMario::CMario(float x, float y, float vx):CGameObject(x, y)
+CMario::CMario(float x, float y, float r, float vx):CGameObject(x, y, r)
 {
 	this->vx = vx;
 };
@@ -11,17 +11,21 @@ void CMario::Update(DWORD dt)
 	x += vx*dt;
 
 	int BackBufferWidth = CGame::GetInstance()->GetBackBufferWidth();
-	if (x <= 0 || x >= BackBufferWidth - MARIO_WIDTH) {
+	if (x <= 0 || x >= BackBufferWidth) {
 
 		vx = -vx;
+
+		y -= DISTANCE_BRICK_ROWS;
+		if (y <= 0)
+			y = MARIO_START_Y;
 
 		if (x <= 0)
 		{
 			x = 0;
 		}
-		else if (x >= BackBufferWidth - MARIO_WIDTH)
+		else if (x >= BackBufferWidth)
 		{
-			x = (float)(BackBufferWidth - MARIO_WIDTH);
+			x = (float)(BackBufferWidth);
 		}
 	}
 }
@@ -53,6 +57,13 @@ void CGlassBrick::Render() {
 
 }
 
+//*CCoin
+void CCoin::Update(DWORD dt)
+{
+	if (y <= 0)
+		y = COIN_START_Y;
+}
+
 void CCoin::Render() {
 
 	LPANIMATION ani = CAnimations::GetInstance()->Get(530);
@@ -62,7 +73,7 @@ void CCoin::Render() {
 }
 
 //*CClubba
-CClubba::CClubba(float x, float y, float vx) :CGameObject(x, y)
+CClubba::CClubba(float x, float y, float r, float vx) :CGameObject(x, y, r)
 {
 	this->vx = vx;
 };
@@ -72,7 +83,7 @@ void CClubba::Update(DWORD dt)
 	x += vx * dt;
 
 	int BackBufferWidth = CGame::GetInstance()->GetBackBufferWidth();
-	if (x <= 0 || x >= BackBufferWidth - MARIO_WIDTH) {
+	if (x <= 0 || x >= BackBufferWidth) {
 
 		vx = -vx;
 
@@ -80,7 +91,7 @@ void CClubba::Update(DWORD dt)
 		{
 			x = 0;
 		}
-		else if (x >= BackBufferWidth - MARIO_WIDTH)
+		else if (x >= BackBufferWidth)
 		{
 			x = (float)(BackBufferWidth - MARIO_WIDTH);
 		}
