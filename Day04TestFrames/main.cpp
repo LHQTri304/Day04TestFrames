@@ -71,6 +71,7 @@ CCoin* coin;
 #define COIN_RADIUS 8.0f
 #define COIN_START_X SCREEN_WIDTH/2
 #define COIN_START_Y 13.0f
+#define NUM_OF_COINS 20
 
 CClubba* clubba;
 #define CLUBBA_START_X 300.0f
@@ -85,6 +86,8 @@ vector<CGlassBrick*> gbricks2;
 vector<CGlassBrick*> gbricks3;
 vector<CGlassBrick*> gbricks4;
 
+vector<CCoin*> coins;
+
 //Check collide function
 int CheckCollideObject(CGameObject* Obj1, CGameObject* Obj2)
 {
@@ -97,9 +100,10 @@ int CheckCollideObject(CGameObject* Obj1, CGameObject* Obj2)
 void CollideMarioCoin(CGameObject* mario, CGameObject* coin)
 {
 	float RandCoinSpawnX = (rand() % (SCREEN_WIDTH - 20) + 10);
+	int SpawnIndex = (rand() % 4);
 
 	if (CheckCollideObject(mario, coin))
-		coin->SetPosition(RandCoinSpawnX, coin->GetY() - DISTANCE_BRICK_ROWS);
+		coin->SetPosition(RandCoinSpawnX, RandMarioSpawnY[SpawnIndex]);	//use mario's for convenience
 }
 
 void CollideMarioClubba(CGameObject* mario, CGameObject* clubba)
@@ -269,6 +273,13 @@ void LoadResources()
 		gbricks4.push_back(new CGlassBrick(nextBrickX, GBRICK_Y - DISTANCE_BRICK_ROWS * 3, 0));
 		nextBrickX += GBRICK_WIDTH;
 	}
+
+	//More coin...
+	for (int i = 0; i <= NUM_OF_COINS; i++)
+	{
+		coins.push_back(new CCoin(COIN_START_X, COIN_START_Y, COIN_RADIUS));
+	}
+
 	
 
 	mario = new CMario(MARIO_START_X, MARIO_START_Y, MARIO_RADIUS, MARIO_START_VX);
@@ -287,8 +298,11 @@ void Update(DWORD dt)
 {
 	mario->Update(dt);
 
-	coin->Update(dt);
-	CollideMarioCoin(mario, coin);
+	for (int i = 0; i <= NUM_OF_COINS; i++)
+	{
+		coins[i]->Update(dt);
+		CollideMarioCoin(mario, coins[i]);
+	}
 
 	clubba->Update(dt);
 	CollideMarioClubba(mario, clubba);
@@ -316,7 +330,7 @@ void Render()
 
 		//brick->Render();
 		//gbrick->Render();
-		coin->Render();
+		//coin->Render();
 
 		mario->Render();
 		clubba->Render();
@@ -329,6 +343,12 @@ void Render()
 			gbricks2[i]->Render();
 			gbricks3[i]->Render();
 			gbricks4[i]->Render();
+		}
+
+
+		for (int i = 0; i <= NUM_OF_COINS; i++)
+		{
+			coins[i]->Render();
 		}
 
 		// Uncomment this line to see how to draw a porttion of a texture  
