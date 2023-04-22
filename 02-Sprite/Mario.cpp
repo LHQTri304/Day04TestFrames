@@ -97,3 +97,11 @@ void CClubba::Render()
 
 	ani->Render(x, y);
 }
+
+//Door...
+void CDoor::Render() {
+
+	LPANIMATION2STAND ani = CAnimationsFor2Stand::GetInstance()->Get(100);
+
+	ani->Render(x, y, spriteHeight);
+}

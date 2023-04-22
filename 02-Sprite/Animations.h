@@ -15,3 +15,17 @@ public:
 
 	static CAnimations* GetInstance();
 };
+
+//Subclass...
+class CAnimationsFor2Stand
+{
+	static CAnimationsFor2Stand* __instance;
+
+	unordered_map<int, LPANIMATION2STAND> animations;
+
+public:
+	void Add(int id, LPANIMATION2STAND ani);
+	LPANIMATION2STAND Get(int id);
+
+	static CAnimationsFor2Stand* GetInstance();
+};

@@ -48,4 +48,12 @@ public:
 	void Render();
 };
 
+class CDoor : public CGameObject {
+	float spriteHeight;
+public:
+	CDoor(float x, float y, float spriteHeight) : CGameObject(x, y) { this->spriteHeight = spriteHeight; }
+	void Update(DWORD dt) {}
+	void Render();
+};
+
 

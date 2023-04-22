@@ -63,6 +63,9 @@ CClubba* clubba;
 #define CLUBBA_START_Y 150.0f
 #define CLUBBA_START_VX 0.1f
 
+CDoor* doors;
+#define DOOR_SPRITE_HEIGHT 16.0f
+
 LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message) {
@@ -181,12 +184,36 @@ void LoadResources()
 	ani->Add(50002,500);
 	animations->Add(540, ani);
 
-
-
 	ani = new CAnimation(100);
 	ani->Add(50011,500);
 	ani->Add(50012,500);
 	animations->Add(541, ani);
+
+	//Door...
+	CAnimationsFor2Stand* animations2 = CAnimationsFor2Stand::GetInstance();
+	LPANIMATION2STAND ani2;
+
+	sprites->Add(50001, 282, 99, 297, 114, texMisc);
+	sprites->Add(50011, 282, 117, 297, 132, texMisc);
+
+	sprites->Add(50002, 282, 135, 297, 150, texMisc);
+	sprites->Add(50012, 282, 153, 297, 168, texMisc);
+
+	sprites->Add(50003, 282, 171, 297, 186, texMisc);
+	sprites->Add(50013, 282, 189, 297, 204, texMisc);
+
+	sprites->Add(50004, 282, 207, 297, 222, texMisc);
+	sprites->Add(50014, 282, 225, 297, 240, texMisc);
+
+	ani2 = new CAnimationFor2Stand(100);
+	ani2->AddTop(50001, 50011, 1000);	//id1 , id2, time
+	ani2->AddTop(50002, 50012);
+	ani2->AddTop(50003, 50013 );
+	ani2->AddTop(50004, 50014, 500);
+	ani2->AddTop(50003, 50013);
+	ani2->AddTop(50002, 50012);
+	animations2->Add(100, ani2);
+
 	
 	
 	mario = new CMario(MARIO_START_X, MARIO_START_Y, MARIO_START_VX);
@@ -194,6 +221,7 @@ void LoadResources()
 	gbrick = new CGlassBrick(200.0f, 100.0f);
 	coin = new CCoin(250.0f, 100.0f);
 	clubba = new CClubba(CLUBBA_START_X, CLUBBA_START_Y, CLUBBA_START_VX);
+	doors = new CDoor(280.0f, 100.0f, DOOR_SPRITE_HEIGHT);
 }
 
 /*
@@ -232,6 +260,8 @@ void Render()
 
 		mario->Render();
 		clubba->Render();
+
+		doors->Render();
 
 		// Uncomment this line to see how to draw a porttion of a texture  
 		//g->Draw(10, 10, texMisc, 300, 117, 316, 133);

@@ -25,16 +25,18 @@ typedef CAnimation* LPANIMATION;
 
 //Subclass...
 
-class CAnimationFor2
+class CAnimationFor2Stand
 {
 	ULONGLONG lastFrameTime;
 	int defaultTime;
 	int currentFrame;
-	vector<LPANIMATION_FRAME2> frames;
+	vector<LPANIMATION_FRAME2STAND> framesTop;
+	vector<LPANIMATION_FRAME2STAND> framesBottom;
 public:
-	CAnimationFor2(int defaultTime) { this->defaultTime = defaultTime; lastFrameTime = -1; currentFrame = -1; }
-	void Add(int spriteId, DWORD time = 0);
-	void Render(float x, float y);
+	CAnimationFor2Stand(int defaultTime) { this->defaultTime = defaultTime; lastFrameTime = -1; currentFrame = -1; }
+	void AddTop(int spriteId1, int spriteId2, DWORD time = 0);
+	//void AddBottom(int spriteId, DWORD time = 0);
+	void Render(float x, float y, float spriteHeight);
 };
 
-typedef CAnimationFor2* LPANIMATION2;
+typedef CAnimationFor2Stand* LPANIMATION2STAND;
