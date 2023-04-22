@@ -11,12 +11,13 @@ void CMario::Update(DWORD dt)
 	x += vx*dt;
 
 	int BackBufferWidth = CGame::GetInstance()->GetBackBufferWidth();
+	int BackBufferHeight = CGame::GetInstance()->GetBackBufferHeight();
 	if (x <= 0 || x >= BackBufferWidth) {
 
 		vx = -vx;
 
-		y -= DISTANCE_BRICK_ROWS;
-		if (y <= 0)
+		y += DISTANCE_BRICK_ROWS;
+		if (y >= BackBufferHeight)
 			y = MARIO_START_Y;
 
 		if (x <= 0)
@@ -87,13 +88,17 @@ void CClubba::Update(DWORD dt)
 
 		vx = -vx;
 
+		y -= DISTANCE_BRICK_ROWS;
+		if (y <= 0)
+			y = CLUBBA_START_Y;
+
 		if (x <= 0)
 		{
 			x = 0;
 		}
 		else if (x >= BackBufferWidth)
 		{
-			x = (float)(BackBufferWidth - MARIO_WIDTH);
+			x = (float)(BackBufferWidth);
 		}
 	}
 }

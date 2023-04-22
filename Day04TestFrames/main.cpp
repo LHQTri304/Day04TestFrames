@@ -50,8 +50,13 @@
 CMario *mario;
 #define MARIO_RADIUS 8.0f
 #define MARIO_START_X 10.0f
-#define MARIO_START_Y 178.0f
+#define MARIO_START_Y 13.0f
 #define MARIO_START_VX 0.3f
+float RandMarioSpawnY[4] = {
+	MARIO_START_Y,
+	MARIO_START_Y + DISTANCE_BRICK_ROWS,
+	MARIO_START_Y + DISTANCE_BRICK_ROWS * 2,
+	MARIO_START_Y + DISTANCE_BRICK_ROWS * 3 };
 
 CBrick *brick;
 
@@ -65,12 +70,12 @@ CGlassBrick* gbrick;
 CCoin* coin;
 #define COIN_RADIUS 8.0f
 #define COIN_START_X SCREEN_WIDTH/2
-#define COIN_START_Y 178.0f
+#define COIN_START_Y 13.0f
 
 CClubba* clubba;
 #define CLUBBA_START_X 300.0f
-#define CLUBBA_START_Y 150.0f
-#define CLUBBA_START_VX 0.1f
+#define CLUBBA_START_Y 178.0f
+#define CLUBBA_START_VX -0.1f
 
 CDoor* doors;
 #define DOOR_SPRITE_HEIGHT 16.0f
@@ -83,14 +88,26 @@ vector<CGlassBrick*> gbricks4;
 //Check collide function
 int CheckCollideObject(CGameObject* Obj1, CGameObject* Obj2)
 {
-	float RandCoinSpawnX = (rand() % (SCREEN_WIDTH-20) + 10);
-
 	if (abs(Obj1->GetX() - Obj2->GetX()) <= Obj1->GetR() + Obj2->GetR()
 		&& abs(Obj1->GetY() - Obj2->GetY()) <= Obj1->GetR() + Obj2->GetR())
-	{
-		Obj2->SetPosition(RandCoinSpawnX, Obj2->GetY() - DISTANCE_BRICK_ROWS);
-	}
+		return 1;
 	return 0;
+}
+
+void CollideMarioCoin(CGameObject* mario, CGameObject* coin)
+{
+	float RandCoinSpawnX = (rand() % (SCREEN_WIDTH - 20) + 10);
+
+	if (CheckCollideObject(mario, coin))
+		coin->SetPosition(RandCoinSpawnX, coin->GetY() - DISTANCE_BRICK_ROWS);
+}
+
+void CollideMarioClubba(CGameObject* mario, CGameObject* clubba)
+{
+	int SpawnIndex = (rand() % 4);
+
+	if (CheckCollideObject(mario, clubba))
+		mario->SetPosition(MARIO_START_X, RandMarioSpawnY[SpawnIndex]);
 }
 
 LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -269,9 +286,12 @@ void LoadResources()
 void Update(DWORD dt)
 {
 	mario->Update(dt);
+
 	coin->Update(dt);
-	CheckCollideObject(mario, coin);
+	CollideMarioCoin(mario, coin);
+
 	clubba->Update(dt);
+	CollideMarioClubba(mario, clubba);
 }
 
 void Render()
@@ -299,7 +319,7 @@ void Render()
 		coin->Render();
 
 		mario->Render();
-		//clubba->Render();
+		clubba->Render();
 
 		//doors->Render();
 

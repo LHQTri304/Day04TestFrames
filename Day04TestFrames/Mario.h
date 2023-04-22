@@ -5,12 +5,15 @@
 #include "Animation.h"
 #include "Animations.h"
 
-#define MARIO_WIDTH 14
-#define MARIO_START_Y 178.0f
+//#define MARIO_WIDTH 14
+#define MARIO_START_Y 13.0f
 
 #define DISTANCE_BRICK_ROWS	55
 
 #define COIN_START_Y 178.0f
+
+#define CLUBBA_START_X 300.0f
+#define CLUBBA_START_Y 178.0f
 
 class CBrick : public CGameObject {
 public: 
