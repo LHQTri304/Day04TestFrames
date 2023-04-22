@@ -254,14 +254,14 @@ void Render()
 		FLOAT NewBlendFactor[4] = { 0,0,0,0 };
 		pD3DDevice->OMSetBlendState(g->GetAlphaBlending(), NewBlendFactor, 0xffffffff);
 
-		brick->Render();
-		gbrick->Render();
-		coin->Render();
+		//brick->Render();
+		//gbrick->Render();
+		//coin->Render();
 
-		mario->Render();
-		clubba->Render();
+		//mario->Render();
+		//clubba->Render();
 
-		doors->Render();
+		//doors->Render();
 
 		// Uncomment this line to see how to draw a porttion of a texture  
 		//g->Draw(10, 10, texMisc, 300, 117, 316, 133);
