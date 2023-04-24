@@ -99,6 +99,7 @@ int lifes = maxScore / NUM_OF_COINS;
 //int victory = 0;	// -1: lose | 1: win
 int running = 1;	// 1: game running | 0: end game
 int pressSpaceBar = 0;
+int numIndex[100];	//0-2 for score | 3-5 for maxScore | 6,7 for lifes
 
 
 //Check collide function
@@ -131,6 +132,20 @@ void CollideMarioClubba(CGameObject* mario, CGameObject* clubba)
 		mario->SetPosition(MARIO_START_X, RandMarioSpawnY[SpawnIndex]);
 		lifes--;
 	}
+}
+
+//Restart game funcsion...
+void RestartGame()
+{
+	score = -NUM_OF_COINS;
+	lifes = maxScore / NUM_OF_COINS;
+	running = 1;
+	pressSpaceBar = 0;
+
+	mario->SetPosition(MARIO_START_X, MARIO_START_Y);
+	clubba->SetPosition(CLUBBA_START_X, CLUBBA_START_Y);
+	for (int i = 0; i < NUM_OF_COINS; i++)
+		coins[i]->SetPosition(COIN_START_X, COIN_START_Y);
 }
 
 LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -369,6 +384,30 @@ void Update(DWORD dt)
 
 		clubba->Update(dt);
 		CollideMarioClubba(mario, clubba);
+
+		//Counting score
+		numIndex[0] = (score % 100) % 10;
+		numIndex[1] = (score % 100) / 10;
+		numIndex[2] = score / 100;
+
+		//Counting max score
+		numIndex[3] = (maxScore % 100) % 10;
+		numIndex[4] = (maxScore % 100) / 10;
+		numIndex[5] = maxScore / 100;
+
+		//Counting life
+		numIndex[6] = (lifes % 100) % 10;
+		numIndex[7] = (lifes % 100) / 10;
+
+
+
+		if (score >= 999 || score >= maxScore || lifes <= 0)	//>=999 to avoid error
+			running = 0;
+	}
+	else if (pressSpaceBar)
+	{
+		RestartGame();
+		running = 1;
 	}
 }
 
@@ -418,38 +457,26 @@ void Render()
 		if (score >= 999 || score >= maxScore)	//>=999 to avoid error
 		{
 			score = maxScore;
-			running = 0;
-			//victory++;
 			stuff[2]->Draw(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 		}
-		int numIndex1 = (score % 100) % 10;
-		int numIndex10 = (score % 100) / 10;
-		int numIndex100 = score / 100;
 		coinScore->Render();
-		numbersRed[numIndex100]->Draw(25.0f, 10.0f);
-		numbersRed[numIndex10]->Draw(35.0f, 10.0f);
-		numbersRed[numIndex1]->Draw(45.0f, 10.0f);
+		numbersRed[numIndex[2]]->Draw(25.0f, 10.0f);
+		numbersRed[numIndex[1]]->Draw(35.0f, 10.0f);
+		numbersRed[numIndex[0]]->Draw(45.0f, 10.0f);
 		stuff[3]->Draw(55.0f, 10.0f);
-		numIndex1 = (maxScore % 100) % 10;
-		numIndex10 = (maxScore % 100) / 10;
-		numIndex100 = maxScore / 100;
-		numbersRed[numIndex100]->Draw(65.0f, 10.0f);
-		numbersRed[numIndex10]->Draw(75.0f, 10.0f);
-		numbersRed[numIndex1]->Draw(85.0f, 10.0f);
+		numbersRed[numIndex[5]]->Draw(65.0f, 10.0f);
+		numbersRed[numIndex[4]]->Draw(75.0f, 10.0f);
+		numbersRed[numIndex[3]]->Draw(85.0f, 10.0f);
 
 
 		if (lifes <= 0)
 		{
 			lifes = 0;
-			running = 0;
-			//victory--;
 			stuff[1]->Draw(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 		}
-		numIndex1 = (lifes % 100) % 10;
-		numIndex10 = (lifes % 100) / 10;
 		stuff[0]->Draw(270.0f, 10.0f);
-		numbersBlack[numIndex10]->Draw(285.0f, 10.0f);
-		numbersBlack[numIndex1]->Draw(295.0f, 10.0f);
+		numbersBlack[numIndex[7]]->Draw(285.0f, 10.0f);
+		numbersBlack[numIndex[6]]->Draw(295.0f, 10.0f);
 
 
 
