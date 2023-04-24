@@ -51,7 +51,7 @@ CMario *mario;
 #define MARIO_RADIUS 8.0f
 #define MARIO_START_X 10.0f
 #define MARIO_START_Y 68.0f
-#define MARIO_START_VX 0.3f
+#define MARIO_START_VX 0.35f
 float RandMarioSpawnY[3] = {
 	MARIO_START_Y,
 	MARIO_START_Y + DISTANCE_BRICK_ROWS,
@@ -70,12 +70,12 @@ CCoin* coinScore;
 #define COIN_RADIUS 8.0f
 #define COIN_START_X SCREEN_WIDTH/2
 #define COIN_START_Y 68.0f
-#define NUM_OF_COINS 10
+#define NUM_OF_COINS 50
 
 CClubba* clubba;
 #define CLUBBA_START_X 300.0f
 #define CLUBBA_START_Y 178.0f
-#define CLUBBA_START_VX -0.1f
+#define CLUBBA_START_VX -0.21f
 
 CDoor* door;
 #define DOOR_SPRITE_HEIGHT 16.0f
@@ -87,8 +87,11 @@ vector<CGlassBrick*> gbricks3;
 
 vector<CCoin*> coins;
 
-vector<LPSPRITE> numbers;
+vector<LPSPRITE> numbersRed;
+vector<LPSPRITE> numbersBlack;
+vector<LPSPRITE> stuff;
 int score = 0;
+int lifes = 99;
 
 //Check collide function
 int CheckCollideObject(CGameObject* Obj1, CGameObject* Obj2)
@@ -116,7 +119,10 @@ void CollideMarioClubba(CGameObject* mario, CGameObject* clubba)
 	int SpawnIndex = (rand() % 3);
 
 	if (CheckCollideObject(mario, clubba))
+	{
 		mario->SetPosition(MARIO_START_X, RandMarioSpawnY[SpawnIndex]);
+		lifes--;
+	}
 }
 
 LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -267,19 +273,32 @@ void LoadResources()
 	ani2->AddTop(50002, 50012);
 	animations2->Add(100, ani2);
 
-	//Red Numbers...
-	numbers.push_back(new CSprite(60000, 549, 174, 556, 187, texMisc));
-	numbers.push_back(new CSprite(60001, 558, 174, 565, 187, texMisc));
-	numbers.push_back(new CSprite(60002, 567, 174, 574, 187, texMisc));
-	numbers.push_back(new CSprite(60003, 576, 174, 583, 187, texMisc));
-	numbers.push_back(new CSprite(60004, 585, 174, 592, 187, texMisc));
-	numbers.push_back(new CSprite(60005, 549, 189, 556, 202, texMisc));
-	numbers.push_back(new CSprite(60006, 558, 189, 565, 202, texMisc));
-	numbers.push_back(new CSprite(60007, 567, 189, 574, 202, texMisc));
-	numbers.push_back(new CSprite(60008, 576, 189, 583, 202, texMisc));
-	numbers.push_back(new CSprite(60009, 585, 189, 592, 202, texMisc));
+	//Red numbers...
+	numbersRed.push_back(new CSprite(60000, 549, 174, 556, 187, texMisc));
+	numbersRed.push_back(new CSprite(60001, 558, 174, 565, 187, texMisc));
+	numbersRed.push_back(new CSprite(60002, 567, 174, 574, 187, texMisc));
+	numbersRed.push_back(new CSprite(60003, 576, 174, 583, 187, texMisc));
+	numbersRed.push_back(new CSprite(60004, 585, 174, 592, 187, texMisc));
+	numbersRed.push_back(new CSprite(60005, 549, 189, 556, 202, texMisc));
+	numbersRed.push_back(new CSprite(60006, 558, 189, 565, 202, texMisc));
+	numbersRed.push_back(new CSprite(60007, 567, 189, 574, 202, texMisc));
+	numbersRed.push_back(new CSprite(60008, 576, 189, 583, 202, texMisc));
+	numbersRed.push_back(new CSprite(60009, 585, 189, 592, 202, texMisc));
 
+	//Black numbers...
+	numbersBlack.push_back(new CSprite(60000, 496, 225, 503, 238, texMisc));
+	numbersBlack.push_back(new CSprite(60001, 505, 225, 512, 238, texMisc));
+	numbersBlack.push_back(new CSprite(60002, 514, 225, 521, 238, texMisc));
+	numbersBlack.push_back(new CSprite(60003, 523, 225, 530, 238, texMisc));
+	numbersBlack.push_back(new CSprite(60004, 532, 225, 539, 238, texMisc));
+	numbersBlack.push_back(new CSprite(60005, 496, 239, 503, 252, texMisc));
+	numbersBlack.push_back(new CSprite(60006, 505, 239, 512, 252, texMisc));
+	numbersBlack.push_back(new CSprite(60007, 514, 239, 521, 252, texMisc));
+	numbersBlack.push_back(new CSprite(60008, 523, 239, 530, 252, texMisc));
+	numbersBlack.push_back(new CSprite(60009, 532, 239, 539, 252, texMisc));
 
+	//Other...
+	stuff.push_back(new CSprite(70001, 215, 120, 230, 135, texMario));
 
 
 
@@ -351,9 +370,6 @@ void Render()
 		//brick->Render();
 		//gbrick->Render();
 
-		mario->Render();
-		clubba->Render();
-
 		//door->Render();
 
 		for (int i = 0; i < NUM_OF_BRICKS; i++)
@@ -369,6 +385,9 @@ void Render()
 			coins[i]->Render();
 		}
 
+		mario->Render();
+		clubba->Render();
+
 
 		if (score > 999)
 			score = 0;
@@ -376,9 +395,18 @@ void Render()
 		int numIndex10 = (score % 100) / 10;
 		int numIndex100 = score / 100;
 		coinScore->Render();
-		numbers[numIndex100]->Draw(25.0f, 10.0f);
-		numbers[numIndex10]->Draw(35.0f, 10.0f);
-		numbers[numIndex1]->Draw(45.0f, 10.0f);
+		numbersRed[numIndex100]->Draw(25.0f, 10.0f);
+		numbersRed[numIndex10]->Draw(35.0f, 10.0f);
+		numbersRed[numIndex1]->Draw(45.0f, 10.0f);
+
+
+		if (lifes < 0)
+			lifes = 99;
+		numIndex1 = (lifes % 100) % 10;
+		numIndex10 = (lifes % 100) / 10;
+		stuff[0]->Draw(270.0f, 10.0f);
+		numbersBlack[numIndex10]->Draw(285.0f, 10.0f);
+		numbersBlack[numIndex1]->Draw(295.0f, 10.0f);
 
 		// Uncomment this line to see how to draw a porttion of a texture  
 		//g->Draw(10, 10, texMisc, 300, 117, 316, 133);
