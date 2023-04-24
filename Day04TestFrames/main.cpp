@@ -40,18 +40,20 @@
 #define ID_TEX_ENEMY_R 10
 #define ID_TEX_ENEMY_L 11
 #define ID_TEX_MISC 20
+#define ID_TEX_VICTORY 30
 
 #define TEXTURES_DIR L"textures"
 #define TEXTURE_PATH_MARIO TEXTURES_DIR "\\mario.png"
 #define TEXTURE_PATH_MISC TEXTURES_DIR "\\misc_transparent.png"
 #define TEXTURE_PATH_ENEMIES_RtL TEXTURES_DIR "\\enemiesRtL.png"
 #define TEXTURE_PATH_ENEMIES_LtR TEXTURES_DIR "\\enemiesLtR.png"
+#define TEXTURE_PATH_VICTORY TEXTURES_DIR "\\victory.png"
 
 CMario *mario;
 #define MARIO_RADIUS 8.0f
 #define MARIO_START_X 10.0f
 #define MARIO_START_Y 68.0f
-#define MARIO_START_VX 0.35f
+#define MARIO_START_VX 0.2f
 float RandMarioSpawnY[3] = {
 	MARIO_START_Y,
 	MARIO_START_Y + DISTANCE_BRICK_ROWS,
@@ -70,12 +72,12 @@ CCoin* coinScore;
 #define COIN_RADIUS 8.0f
 #define COIN_START_X SCREEN_WIDTH/2
 #define COIN_START_Y 68.0f
-#define NUM_OF_COINS 50
+#define NUM_OF_COINS 20
 
 CClubba* clubba;
 #define CLUBBA_START_X 300.0f
 #define CLUBBA_START_Y 178.0f
-#define CLUBBA_START_VX -0.21f
+#define CLUBBA_START_VX -0.15f
 
 CDoor* door;
 #define DOOR_SPRITE_HEIGHT 16.0f
@@ -90,8 +92,13 @@ vector<CCoin*> coins;
 vector<LPSPRITE> numbersRed;
 vector<LPSPRITE> numbersBlack;
 vector<LPSPRITE> stuff;
-int score = 0;
-int lifes = 99;
+int baseScore = 0;
+int maxScore = 1000;
+int baseLifes = 10;
+int score = baseScore;
+int lifes = baseLifes;
+int victory = 0;	// -1: lose | 1: win
+int running = 1;	// 1: game running | 0: end game
 
 //Check collide function
 int CheckCollideObject(CGameObject* Obj1, CGameObject* Obj2)
@@ -151,6 +158,7 @@ void LoadResources()
 	textures->Add(ID_TEX_ENEMY_R, TEXTURE_PATH_ENEMIES_RtL);
 	textures->Add(ID_TEX_ENEMY_L, TEXTURE_PATH_ENEMIES_LtR);
 	textures->Add(ID_TEX_MISC, TEXTURE_PATH_MISC);
+	textures->Add(ID_TEX_VICTORY, TEXTURE_PATH_VICTORY);
 
 
 	CSprites * sprites = CSprites::GetInstance();
@@ -239,13 +247,13 @@ void LoadResources()
 	sprites->Add(50012, 28, 129, 43, 155, texEnemyR);
 
 	ani = new CAnimation(100);
-	ani->Add(50001,500);
-	ani->Add(50002,500);
+	ani->Add(50001,250);
+	ani->Add(50002,250);
 	animations->Add(540, ani);
 
 	ani = new CAnimation(100);
-	ani->Add(50011,500);
-	ani->Add(50012,500);
+	ani->Add(50011,250);
+	ani->Add(50012,250);
 	animations->Add(541, ani);
 
 	//Door...
@@ -298,7 +306,10 @@ void LoadResources()
 	numbersBlack.push_back(new CSprite(60009, 532, 239, 539, 252, texMisc));
 
 	//Other...
+	LPTEXTURE texVictory = textures->Get(ID_TEX_VICTORY);
 	stuff.push_back(new CSprite(70001, 215, 120, 230, 135, texMario));
+	stuff.push_back(new CSprite(70002, 456, 266, 521, 283, texMisc));
+	stuff.push_back(new CSprite(70002, 0, 0, 220, 95, texVictory));
 
 
 
@@ -335,16 +346,19 @@ void LoadResources()
 */
 void Update(DWORD dt)
 {
-	mario->Update(dt);
-
-	for (int i = 0; i <= NUM_OF_COINS; i++)
+	if (running)
 	{
-		coins[i]->Update(dt);
-		CollideMarioCoin(mario, coins[i]);
-	}
+		mario->Update(dt);
 
-	clubba->Update(dt);
-	CollideMarioClubba(mario, clubba);
+		for (int i = 0; i <= NUM_OF_COINS; i++)
+		{
+			coins[i]->Update(dt);
+			CollideMarioCoin(mario, coins[i]);
+		}
+
+		clubba->Update(dt);
+		CollideMarioClubba(mario, clubba);
+	}
 }
 
 void Render()
@@ -367,30 +381,37 @@ void Render()
 		FLOAT NewBlendFactor[4] = { 0,0,0,0 };
 		pD3DDevice->OMSetBlendState(g->GetAlphaBlending(), NewBlendFactor, 0xffffffff);
 
-		//brick->Render();
-		//gbrick->Render();
-
-		//door->Render();
-
-		for (int i = 0; i < NUM_OF_BRICKS; i++)
+		if(running)		
 		{
-			gbricks1[i]->Render();
-			gbricks2[i]->Render();
-			gbricks3[i]->Render();
+			//brick->Render();
+			//gbrick->Render();
+
+			//door->Render();
+
+			for (int i = 0; i < NUM_OF_BRICKS; i++)
+			{
+				gbricks1[i]->Render();
+				gbricks2[i]->Render();
+				gbricks3[i]->Render();
+			}
+
+
+			for (int i = 0; i <= NUM_OF_COINS; i++)
+			{
+				coins[i]->Render();
+			}
+
+			mario->Render();
+			clubba->Render();
 		}
 
-
-		for (int i = 0; i <= NUM_OF_COINS; i++)
+		if (score >= 999 || score >= maxScore)	//>=999 to avoid error
 		{
-			coins[i]->Render();
+			score = maxScore;
+			running = 0;
+			victory++;
+			stuff[2]->Draw(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 		}
-
-		mario->Render();
-		clubba->Render();
-
-
-		if (score > 999)
-			score = 0;
 		int numIndex1 = (score % 100) % 10;
 		int numIndex10 = (score % 100) / 10;
 		int numIndex100 = score / 100;
@@ -400,13 +421,20 @@ void Render()
 		numbersRed[numIndex1]->Draw(45.0f, 10.0f);
 
 
-		if (lifes < 0)
-			lifes = 99;
+		if (lifes <= 0)
+		{
+			lifes = 0;
+			running = 0;
+			victory--;
+			stuff[1]->Draw(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+		}
 		numIndex1 = (lifes % 100) % 10;
 		numIndex10 = (lifes % 100) / 10;
 		stuff[0]->Draw(270.0f, 10.0f);
 		numbersBlack[numIndex10]->Draw(285.0f, 10.0f);
 		numbersBlack[numIndex1]->Draw(295.0f, 10.0f);
+
+
 
 		// Uncomment this line to see how to draw a porttion of a texture  
 		//g->Draw(10, 10, texMisc, 300, 117, 316, 133);
