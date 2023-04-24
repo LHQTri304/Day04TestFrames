@@ -19,14 +19,14 @@ void CMario::Update(DWORD dt)
 		y += DISTANCE_BRICK_ROWS;
 		if (y >= BackBufferHeight)
 			y = MARIO_START_Y;
-
+		
 		if (x <= 0)
 		{
-			x = 0;
+			x = 10;
 		}
 		else if (x >= BackBufferWidth)
 		{
-			x = (float)(BackBufferWidth);
+			x = (float)(BackBufferWidth) -10;
 		}
 	}
 }

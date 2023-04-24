@@ -28,6 +28,7 @@ protected:
 	float vx;
 public:
 	CMario(float x, float y, float r, float vx);
+	void ReverseVX(int signal) { if(signal) vx = -vx; }
 	void Update(DWORD dt);
 	void Render();
 };

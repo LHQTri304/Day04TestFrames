@@ -70,8 +70,8 @@ CGlassBrick* gbrick;
 
 CCoin* coinScore;
 #define COIN_RADIUS 8.0f
-#define COIN_START_X SCREEN_WIDTH/2
-#define COIN_START_Y 68.0f
+#define COIN_START_X MARIO_START_X
+#define COIN_START_Y MARIO_START_Y
 #define NUM_OF_COINS 10
 
 CClubba* clubba;
@@ -93,11 +93,12 @@ vector<LPSPRITE> numbersRed;
 vector<LPSPRITE> numbersBlack;
 vector<LPSPRITE> stuff;
 int baseLifes = 10;
-int maxScore = 100;	//Do not set it over 999
-int score = 0;
+int maxScore = 50;	//Do not set it over 999
+int score = -NUM_OF_COINS;
 int lifes = maxScore / NUM_OF_COINS;
 //int victory = 0;	// -1: lose | 1: win
 int running = 1;	// 1: game running | 0: end game
+int pressSpaceBar = 0;
 
 
 //Check collide function
@@ -137,6 +138,14 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	switch (message) {
 	case WM_DESTROY:
 		PostQuitMessage(0);
+		break;
+	case WM_KEYDOWN:
+		if (wParam == VK_SPACE)
+		{
+			pressSpaceBar = 1;
+			break;
+		}
+		pressSpaceBar = 0;
 		break;
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
@@ -348,6 +357,8 @@ void Update(DWORD dt)
 {
 	if (running)
 	{
+		mario->ReverseVX(pressSpaceBar);
+		pressSpaceBar = 0;
 		mario->Update(dt);
 
 		for (int i = 0; i < NUM_OF_COINS; i++)
@@ -384,7 +395,6 @@ void Render()
 		if(running)		
 		{
 			//brick->Render();
-			//gbrick->Render();
 
 			//door->Render();
 
