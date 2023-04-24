@@ -72,12 +72,12 @@ CCoin* coinScore;
 #define COIN_RADIUS 8.0f
 #define COIN_START_X SCREEN_WIDTH/2
 #define COIN_START_Y 68.0f
-#define NUM_OF_COINS 20
+#define NUM_OF_COINS 10
 
 CClubba* clubba;
 #define CLUBBA_START_X 300.0f
 #define CLUBBA_START_Y 178.0f
-#define CLUBBA_START_VX -0.15f
+#define CLUBBA_START_VX -0.12f
 
 CDoor* door;
 #define DOOR_SPRITE_HEIGHT 16.0f
@@ -92,13 +92,13 @@ vector<CCoin*> coins;
 vector<LPSPRITE> numbersRed;
 vector<LPSPRITE> numbersBlack;
 vector<LPSPRITE> stuff;
-int baseScore = 0;
-int maxScore = 1000;
 int baseLifes = 10;
-int score = baseScore;
-int lifes = baseLifes;
-int victory = 0;	// -1: lose | 1: win
+int maxScore = 100;	//Do not set it over 999
+int score = 0;
+int lifes = maxScore / NUM_OF_COINS;
+//int victory = 0;	// -1: lose | 1: win
 int running = 1;	// 1: game running | 0: end game
+
 
 //Check collide function
 int CheckCollideObject(CGameObject* Obj1, CGameObject* Obj2)
@@ -309,8 +309,8 @@ void LoadResources()
 	LPTEXTURE texVictory = textures->Get(ID_TEX_VICTORY);
 	stuff.push_back(new CSprite(70001, 215, 120, 230, 135, texMario));
 	stuff.push_back(new CSprite(70002, 456, 266, 521, 283, texMisc));
-	stuff.push_back(new CSprite(70002, 0, 0, 220, 95, texVictory));
-
+	stuff.push_back(new CSprite(70003, 0, 0, 220, 95, texVictory));
+	stuff.push_back(new CSprite(70004, 553, 116, 560, 131, texMisc));
 
 
 	
@@ -325,7 +325,7 @@ void LoadResources()
 	}
 
 	//More coin...
-	for (int i = 0; i <= NUM_OF_COINS; i++)
+	for (int i = 0; i < NUM_OF_COINS; i++)
 	{
 		coins.push_back(new CCoin(COIN_START_X, COIN_START_Y, COIN_RADIUS));
 	}
@@ -350,7 +350,7 @@ void Update(DWORD dt)
 	{
 		mario->Update(dt);
 
-		for (int i = 0; i <= NUM_OF_COINS; i++)
+		for (int i = 0; i < NUM_OF_COINS; i++)
 		{
 			coins[i]->Update(dt);
 			CollideMarioCoin(mario, coins[i]);
@@ -396,7 +396,7 @@ void Render()
 			}
 
 
-			for (int i = 0; i <= NUM_OF_COINS; i++)
+			for (int i = 0; i < NUM_OF_COINS; i++)
 			{
 				coins[i]->Render();
 			}
@@ -409,7 +409,7 @@ void Render()
 		{
 			score = maxScore;
 			running = 0;
-			victory++;
+			//victory++;
 			stuff[2]->Draw(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 		}
 		int numIndex1 = (score % 100) % 10;
@@ -419,13 +419,20 @@ void Render()
 		numbersRed[numIndex100]->Draw(25.0f, 10.0f);
 		numbersRed[numIndex10]->Draw(35.0f, 10.0f);
 		numbersRed[numIndex1]->Draw(45.0f, 10.0f);
+		stuff[3]->Draw(55.0f, 10.0f);
+		numIndex1 = (maxScore % 100) % 10;
+		numIndex10 = (maxScore % 100) / 10;
+		numIndex100 = maxScore / 100;
+		numbersRed[numIndex100]->Draw(65.0f, 10.0f);
+		numbersRed[numIndex10]->Draw(75.0f, 10.0f);
+		numbersRed[numIndex1]->Draw(85.0f, 10.0f);
 
 
 		if (lifes <= 0)
 		{
 			lifes = 0;
 			running = 0;
-			victory--;
+			//victory--;
 			stuff[1]->Draw(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 		}
 		numIndex1 = (lifes % 100) % 10;
