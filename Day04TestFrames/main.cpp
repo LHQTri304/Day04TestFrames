@@ -66,25 +66,29 @@ CGlassBrick* gbrick;
 #define NUM_OF_BRICKS 20
 #define DISTANCE_BRICK_ROWS	55
 
-CCoin* coin;
+CCoin* coinScore;
 #define COIN_RADIUS 8.0f
 #define COIN_START_X SCREEN_WIDTH/2
 #define COIN_START_Y 68.0f
-#define NUM_OF_COINS 20
+#define NUM_OF_COINS 10
 
 CClubba* clubba;
 #define CLUBBA_START_X 300.0f
 #define CLUBBA_START_Y 178.0f
 #define CLUBBA_START_VX -0.1f
 
-CDoor* doors;
+CDoor* door;
 #define DOOR_SPRITE_HEIGHT 16.0f
+
 
 vector<CGlassBrick*> gbricks1;
 vector<CGlassBrick*> gbricks2;
 vector<CGlassBrick*> gbricks3;
 
 vector<CCoin*> coins;
+
+vector<LPSPRITE> numbers;
+int score = 0;
 
 //Check collide function
 int CheckCollideObject(CGameObject* Obj1, CGameObject* Obj2)
@@ -101,7 +105,10 @@ void CollideMarioCoin(CGameObject* mario, CGameObject* coin)
 	int SpawnIndex = (rand() % 3);
 
 	if (CheckCollideObject(mario, coin))
+	{
 		coin->SetPosition(RandCoinSpawnX, RandMarioSpawnY[SpawnIndex]);	//use mario's for convenience
+		score++;
+	}
 }
 
 void CollideMarioClubba(CGameObject* mario, CGameObject* clubba)
@@ -260,6 +267,22 @@ void LoadResources()
 	ani2->AddTop(50002, 50012);
 	animations2->Add(100, ani2);
 
+	//Red Numbers...
+	numbers.push_back(new CSprite(60000, 549, 174, 556, 187, texMisc));
+	numbers.push_back(new CSprite(60001, 558, 174, 565, 187, texMisc));
+	numbers.push_back(new CSprite(60002, 567, 174, 574, 187, texMisc));
+	numbers.push_back(new CSprite(60003, 576, 174, 583, 187, texMisc));
+	numbers.push_back(new CSprite(60004, 585, 174, 592, 187, texMisc));
+	numbers.push_back(new CSprite(60005, 549, 189, 556, 202, texMisc));
+	numbers.push_back(new CSprite(60006, 558, 189, 565, 202, texMisc));
+	numbers.push_back(new CSprite(60007, 567, 189, 574, 202, texMisc));
+	numbers.push_back(new CSprite(60008, 576, 189, 583, 202, texMisc));
+	numbers.push_back(new CSprite(60009, 585, 189, 592, 202, texMisc));
+
+
+
+
+
 	
 	//Row of bricks...
 	float nextBrickX = GBRICK_X;
@@ -280,11 +303,11 @@ void LoadResources()
 	
 
 	mario = new CMario(MARIO_START_X, MARIO_START_Y, MARIO_RADIUS, MARIO_START_VX);
-	brick = new CBrick(100.0f, 100.0f, 0);
-	gbrick = new CGlassBrick(200.0f, 100.0f, 0);
-	coin = new CCoin(COIN_START_X, COIN_START_Y, COIN_RADIUS);
+	//brick = new CBrick(100.0f, 100.0f, 0);
+	//gbrick = new CGlassBrick(200.0f, 100.0f, 0);
+	coinScore = new CCoin(10.0f, 10.0f, 0);
 	clubba = new CClubba(CLUBBA_START_X, CLUBBA_START_Y, 0, CLUBBA_START_VX);
-	doors = new CDoor(280.0f, 100.0f, DOOR_SPRITE_HEIGHT, 0);
+	//door = new CDoor(280.0f, 100.0f, DOOR_SPRITE_HEIGHT, 0);
 }
 
 /*
@@ -327,12 +350,11 @@ void Render()
 
 		//brick->Render();
 		//gbrick->Render();
-		//coin->Render();
 
 		mario->Render();
 		clubba->Render();
 
-		//doors->Render();
+		//door->Render();
 
 		for (int i = 0; i < NUM_OF_BRICKS; i++)
 		{
@@ -346,6 +368,17 @@ void Render()
 		{
 			coins[i]->Render();
 		}
+
+
+		if (score > 999)
+			score = 0;
+		int numIndex1 = (score % 100) % 10;
+		int numIndex10 = (score % 100) / 10;
+		int numIndex100 = score / 100;
+		coinScore->Render();
+		numbers[numIndex100]->Draw(25.0f, 10.0f);
+		numbers[numIndex10]->Draw(35.0f, 10.0f);
+		numbers[numIndex1]->Draw(45.0f, 10.0f);
 
 		// Uncomment this line to see how to draw a porttion of a texture  
 		//g->Draw(10, 10, texMisc, 300, 117, 316, 133);
