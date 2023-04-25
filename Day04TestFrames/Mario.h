@@ -55,6 +55,7 @@ protected:
 public:
 	CClubba(float x, float y, float r, float vx);
 	void Stun();
+	void SpeedUp();
 	void BeBack();
 	void Update(DWORD dt);
 	void Render();

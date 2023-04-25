@@ -81,6 +81,15 @@ void CClubba::Stun()
 		vx = 0.00001;
 }
 
+void CClubba::SpeedUp()
+{
+	lastVX = vx;
+	if (vx <= 0)
+		vx = -0.5;
+	else
+		vx = 0.5;
+}
+
 void CClubba::BeBack()
 {
 	vx = lastVX;

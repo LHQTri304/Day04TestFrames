@@ -29,7 +29,7 @@
 
 
 #define WINDOW_CLASS_NAME L"SampleWindow"
-#define MAIN_WINDOW_TITLE L"02 - Sprite animation"
+#define MAIN_WINDOW_TITLE L"Day04 - Simple Mario Game"
 #define WINDOW_ICON_PATH L"mario.ico"
 
 #define BACKGROUND_COLOR D3DXCOLOR(200.0f/255, 200.0f/255, 255.0f/255,0.0f)
@@ -41,6 +41,8 @@
 #define ID_TEX_ENEMY_L 11
 #define ID_TEX_MISC 20
 #define ID_TEX_VICTORY 30
+#define ID_TEX_LIGHT_EFFECT 40
+#define ID_TEX_BACKGROUND 50
 
 #define TEXTURES_DIR L"textures"
 #define TEXTURE_PATH_MARIO TEXTURES_DIR "\\mario.png"
@@ -48,6 +50,8 @@
 #define TEXTURE_PATH_ENEMIES_RtL TEXTURES_DIR "\\enemiesRtL.png"
 #define TEXTURE_PATH_ENEMIES_LtR TEXTURES_DIR "\\enemiesLtR.png"
 #define TEXTURE_PATH_VICTORY TEXTURES_DIR "\\victory.png"
+#define TEXTURE_PATH_LIGHT_EFFECT TEXTURES_DIR "\\light_effect.png"
+#define TEXTURE_PATH_BACKGROUND TEXTURES_DIR "\\background.jpg"
 
 CMario *mario;
 #define MARIO_RADIUS 8.0f
@@ -84,6 +88,7 @@ CClubba* clubba;
 #define CLUBBA_START_Y 178.0f
 #define CLUBBA_START_VX -0.12f
 #define CLUBBA_STUN_TIME 100
+#define CLUBBA_SPEED_TIME 50
 
 CDoor* door;
 #define DOOR_RADIUS 16.0f
@@ -103,21 +108,28 @@ vector<CCoin*> coins;
 
 vector<LPSPRITE> numbersRed;
 vector<LPSPRITE> numbersBlack;
+vector<LPSPRITE> lights;
 vector<LPSPRITE> stuff;
 
 
 int baseLifes = 10;
-int maxScore = 50;	//Do not set it over 999
-int score = -NUM_OF_COINS;
+int maxScore = 100;	//Do not set it over 999
+int score = -NUM_OF_COINS;	//Let Mario collide all coins to teleport them randomly form the beginning
 int lifes = maxScore / NUM_OF_COINS;
-//int victory = 0;	// -1: lose | 1: win
 int running = 1;	// 1: game running | 0: end game
 int pressSpaceBar = 0;
 int pressX = 0;
 int pressZ = 0;
 int numIndex[100];	//0-2 for score | 3-5 for maxScore | 6,7 for lifes
-int countDownStun = CLUBBA_STUN_TIME;
-int clubbaStuned = 0;
+int countdownStun = CLUBBA_STUN_TIME;
+int countdownSpeedUp = CLUBBA_SPEED_TIME;
+int clubbaStatus = 0;	// 0: normal | 1: stuned | 2: speed up
+int remainingSkills = NUM_OF_SKILLS;
+int lightOn = 0;
+int lightIndex = -1;
+int lightCountdown = 0;
+int usingSkill = 0;
+int skillCountdown = 110;
 
 
 //Check collide function
@@ -158,7 +170,7 @@ void CollideClubbaDoor(CClubba* clubba, CDoor* door)
 	{
 		door->SetPosition(DOOR_START_X, DOOR_START_Y);
 		clubba->Stun();
-		clubbaStuned = 1;
+		clubbaStatus = 1;
 	}
 }
 
@@ -169,13 +181,39 @@ void RestartGame()
 	lifes = maxScore / NUM_OF_COINS;
 	running = 1;
 	pressSpaceBar = 0;
+	remainingSkills = NUM_OF_SKILLS;
 
 	mario->SetPosition(MARIO_START_X, MARIO_START_Y);
 	clubba->SetPosition(CLUBBA_START_X, CLUBBA_START_Y);
 	for (int i = 0; i < NUM_OF_COINS; i++)
 		coins[i]->SetPosition(COIN_START_X, COIN_START_Y);
+	door->SetPosition(DOOR_START_X, DOOR_START_Y);
 }
 
+//Skill active function...
+void Skill(int index)
+{
+	lightCountdown = 15;
+	lightIndex = index;
+	switch (index)
+	{
+	case 0:		//Free stun
+		clubba->Stun();
+		clubbaStatus = 1;
+		break;
+	case 1:		//More lifes
+		lifes += 5;
+		break;
+	case 2:		//Clubba speed up
+		clubba->SpeedUp();
+		clubbaStatus = 2;
+		break;
+	default:
+		break;
+	}
+}
+
+//The rest funcsion
 LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message) {
@@ -224,6 +262,8 @@ void LoadResources()
 	textures->Add(ID_TEX_ENEMY_L, TEXTURE_PATH_ENEMIES_LtR);
 	textures->Add(ID_TEX_MISC, TEXTURE_PATH_MISC);
 	textures->Add(ID_TEX_VICTORY, TEXTURE_PATH_VICTORY);
+	textures->Add(ID_TEX_LIGHT_EFFECT, TEXTURE_PATH_LIGHT_EFFECT);
+	textures->Add(ID_TEX_BACKGROUND, TEXTURE_PATH_BACKGROUND);
 
 
 	CSprites * sprites = CSprites::GetInstance();
@@ -370,12 +410,29 @@ void LoadResources()
 	numbersBlack.push_back(new CSprite(60008, 523, 239, 530, 252, texMisc));
 	numbersBlack.push_back(new CSprite(60009, 532, 239, 539, 252, texMisc));
 
+	//Light effect...
+	LPTEXTURE texLight = textures->Get(ID_TEX_LIGHT_EFFECT);
+	lights.push_back(new CSprite(90001, 2, 2, 697, 618, texLight));
+	lights.push_back(new CSprite(90002, 702, 2, 1397, 618, texLight));
+	lights.push_back(new CSprite(90003, 1402, 2, 2097, 618, texLight));
+	lights.push_back(new CSprite(90004, 2102, 2, 2797, 618, texLight));
+	lights.push_back(new CSprite(90005, 2, 623, 697, 1239, texLight));
+	lights.push_back(new CSprite(90006, 702, 623, 1397, 1239, texLight));
+	lights.push_back(new CSprite(90007, 1402, 623, 2097, 1239, texLight));
+	lights.push_back(new CSprite(90008, 2102, 623, 2797, 1239, texLight));
+	lights.push_back(new CSprite(90009, 2, 1244, 697, 1860, texLight));
+	lights.push_back(new CSprite(90010, 702, 1244, 1397, 1860, texLight));
+	lights.push_back(new CSprite(90011, 1402, 1244, 2097, 1860, texLight));
+	lights.push_back(new CSprite(90012, 2102, 1244, 2797, 1860, texLight));
+
 	//Other...
 	LPTEXTURE texVictory = textures->Get(ID_TEX_VICTORY);
+	LPTEXTURE texBackground = textures->Get(ID_TEX_BACKGROUND);
 	stuff.push_back(new CSprite(70001, 215, 120, 230, 135, texMario));
 	stuff.push_back(new CSprite(70002, 456, 266, 521, 283, texMisc));
 	stuff.push_back(new CSprite(70003, 0, 0, 220, 95, texVictory));
 	stuff.push_back(new CSprite(70004, 553, 116, 560, 131, texMisc));
+	stuff.push_back(new CSprite(70005, 0, 0, 445, 250, texBackground));
 
 
 	
@@ -420,32 +477,65 @@ void Update(DWORD dt)
 {
 	if (running)
 	{
+		//Mario...
 		mario->ReverseVX(pressSpaceBar);
 		pressSpaceBar = 0;
 		mario->Update(dt);
 
+		if (pressX)
+			door->SetPosition(mario->GetX(), mario->GetY() - 10);
+		pressX = 0;
+
+		//Coin...
 		for (int i = 0; i < NUM_OF_COINS; i++)
 		{
 			coins[i]->Update(dt);
 			CollideMarioCoin(mario, coins[i]);
 		}
 
+		//Clubba...
 		clubba->Update(dt);
 		CollideMarioClubba(mario, clubba);
 
-		if (pressX)
-			door->SetPosition(mario->GetX(), mario->GetY() - 10);
-		pressX = 0;
-
 		CollideClubbaDoor(clubba, door);
-		if(!countDownStun)
+		if(!countdownStun)
 		{
-			countDownStun = CLUBBA_STUN_TIME;
+			countdownStun = CLUBBA_STUN_TIME;
 			clubba->BeBack();
-			clubbaStuned = 0;
+			clubbaStatus = 0;
 		}
-		if (clubbaStuned)
-			countDownStun--;
+		if (clubbaStatus == 1)
+			countdownStun--;
+
+		if (!countdownSpeedUp)
+		{
+			countdownSpeedUp = CLUBBA_SPEED_TIME;
+			clubba->BeBack();
+			clubbaStatus = 0;
+		}
+		if (clubbaStatus == 2)
+			countdownSpeedUp--;
+
+		//Skill (Question Brick)...
+		if (pressZ && remainingSkills && !usingSkill)
+		{
+			remainingSkills--;
+			skillCountdown = 110;
+			usingSkill = 1;
+			lightOn = 1;
+			Skill(rand()%3);
+			pressZ = 0;
+		}
+
+		if (lightOn && lightCountdown)
+			lightCountdown--;
+		if (lightCountdown <= 0)
+			lightOn = 0;
+
+		if (usingSkill)
+			skillCountdown--;
+		if (skillCountdown <= 0)
+			usingSkill = 0;
 
 		//Counting score
 		numIndex[0] = (score % 100) % 10;
@@ -493,9 +583,11 @@ void Render()
 		FLOAT NewBlendFactor[4] = { 0,0,0,0 };
 		pD3DDevice->OMSetBlendState(g->GetAlphaBlending(), NewBlendFactor, 0xffffffff);
 
-		if(running)		
+		stuff[4]->Draw(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+
+		if (running)
 		{
-			for (int i = 0; i < NUM_OF_SKILLS; i++)
+			for (int i = 0; i < remainingSkills; i++)
 				questBricks[i]->Render();
 
 			door->Render();
@@ -515,7 +607,11 @@ void Render()
 
 			mario->Render();
 			clubba->Render();
+
+			if (lightOn && lightCountdown)
+				lights[lightIndex]->Draw(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 		}
+
 
 		if (score >= 999 || score >= maxScore)	//>=999 to avoid error
 		{
