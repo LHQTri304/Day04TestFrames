@@ -51,8 +51,11 @@ class CClubba : public CGameObject
 {
 protected:
 	float vx;
+	float lastVX = 0;
 public:
 	CClubba(float x, float y, float r, float vx);
+	void Stun();
+	void BeBack();
 	void Update(DWORD dt);
 	void Render();
 };

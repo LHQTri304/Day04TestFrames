@@ -1,70 +1,70 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Animation.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Animations.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="debug.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Game.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Mario.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Animation.cpp">
+      <Filter>Source Files\Animation</Filter>
     </ClCompile>
-    <ClCompile Include="Sprite.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Animations.cpp">
+      <Filter>Source Files\Animation</Filter>
     </ClCompile>
-    <ClCompile Include="Sprites.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="debug.cpp">
+      <Filter>Source Files\GameSys</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Source Files\GameSys</Filter>
     </ClCompile>
     <ClCompile Include="Textures.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\GameSys</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Mario.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprite.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprites.cpp">
+      <Filter>Source Files\Objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Animation</Filter>
     </ClInclude>
     <ClInclude Include="AnimationFrame.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Animation</Filter>
     </ClInclude>
     <ClInclude Include="Animations.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="debug.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Game.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Animation</Filter>
     </ClInclude>
     <ClInclude Include="GameObject.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Objects</Filter>
     </ClInclude>
     <ClInclude Include="Mario.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="Sprite.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="debug.h">
+      <Filter>Header Files\GameSys</Filter>
     </ClInclude>
-    <ClInclude Include="Sprites.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Game.h">
+      <Filter>Header Files\GameSys</Filter>
     </ClInclude>
     <ClInclude Include="Texture.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\GameSys</Filter>
     </ClInclude>
     <ClInclude Include="Textures.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\GameSys</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprite.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprites.h">
+      <Filter>Header Files\Objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -79,6 +79,24 @@
     </Filter>
     <Filter Include="Source Files">
       <UniqueIdentifier>{2a841d7a-04ad-4b61-8c9f-dfd7be58c28a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Animation">
+      <UniqueIdentifier>{239c64a2-333c-4231-afea-3bf0846feb63}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects">
+      <UniqueIdentifier>{6fd1e41f-8a24-4988-b873-6d5fd18ca4ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\GameSys">
+      <UniqueIdentifier>{7ad96bc2-bcde-4bfa-b649-ed8f30c9537e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Animation">
+      <UniqueIdentifier>{b30662d1-d0b3-4d79-b78d-f10816c07849}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GameSys">
+      <UniqueIdentifier>{f3acaa4e-d139-4e61-9634-1e1f7b0c40f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Objects">
+      <UniqueIdentifier>{aaf56007-2969-44e0-a7f6-0a86244e0615}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

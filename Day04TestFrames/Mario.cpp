@@ -72,6 +72,20 @@ CClubba::CClubba(float x, float y, float r, float vx) :CGameObject(x, y, r)
 	this->vx = vx;
 };
 
+void CClubba::Stun()
+{
+	lastVX = vx;
+	if (vx <= 0)	//if set it only = 0, clubba always facing left when being stuned
+		vx = -0.00001;
+	else
+		vx = 0.00001;
+}
+
+void CClubba::BeBack()
+{
+	vx = lastVX;
+}
+
 void CClubba::Update(DWORD dt)
 {
 	x += vx * dt;

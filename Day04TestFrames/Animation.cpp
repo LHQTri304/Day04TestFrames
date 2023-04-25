@@ -35,7 +35,7 @@ void CAnimation::Render(float x, float y)
 }
 
 //Subclass...
-void CAnimationFor2Stand::AddTop(int spriteId1, int spriteId2, DWORD time)
+void CAnimationFor2Stand::Add(int spriteId1, int spriteId2, DWORD time)
 {
 	int t = time;
 	if (time == 0) t = this->defaultTime;
@@ -43,7 +43,7 @@ void CAnimationFor2Stand::AddTop(int spriteId1, int spriteId2, DWORD time)
 	LPSPRITE sprite1 = CSprites::GetInstance()->Get(spriteId1);
 	LPSPRITE sprite2 = CSprites::GetInstance()->Get(spriteId2);
 	LPANIMATION_FRAME2STAND frame = new CAnimationFrameFor2Stand(sprite1, sprite2, t);
-	framesTop.push_back(frame);
+	frames.push_back(frame);
 }
 /*
 void CAnimationFor2Stand::AddBottom(int spriteId, DWORD time)
@@ -67,17 +67,17 @@ void CAnimationFor2Stand::Render(float x, float y, float spriteHeight)
 	}
 	else
 	{
-		DWORD t = framesTop[currentFrame]->GetTime();
+		DWORD t = frames[currentFrame]->GetTime();
 		if (now - lastFrameTime > t)
 		{
 			currentFrame++;
 			lastFrameTime = now;
-			if (currentFrame == framesTop.size()) currentFrame = 0;
+			if (currentFrame == frames.size()) currentFrame = 0;
 			//DebugOut(L"now: %d, lastFrameTime: %d, t: %d\n", now, lastFrameTime, t);
 		}
 
 	}
 
-	framesTop[currentFrame]->GetSprite1()->Draw(x, y);
-	framesTop[currentFrame]->GetSprite2()->Draw(x, y + spriteHeight);
+	frames[currentFrame]->GetSprite1()->Draw(x, y);
+	frames[currentFrame]->GetSprite2()->Draw(x, y + spriteHeight);
 }

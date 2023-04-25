@@ -59,9 +59,14 @@ float RandMarioSpawnY[3] = {
 	MARIO_START_Y + DISTANCE_BRICK_ROWS,
 	MARIO_START_Y + DISTANCE_BRICK_ROWS * 2};
 
-CBrick *brick;
+//CBrick *brick;
+#define QSTBRICK_X 115.0f
+#define QSTBRICK_Y 10.0f
+#define QSTBRICK_WIDTH 16
+#define NUM_OF_SKILLS 5
+#define DISTANCE_BW_SKILL 6
 
-CGlassBrick* gbrick;
+//CGlassBrick* gbrick;
 #define GBRICK_X 0.0f
 #define GBRICK_Y 200.0f
 #define GBRICK_WIDTH 16
@@ -78,10 +83,17 @@ CClubba* clubba;
 #define CLUBBA_START_X 300.0f
 #define CLUBBA_START_Y 178.0f
 #define CLUBBA_START_VX -0.12f
+#define CLUBBA_STUN_TIME 100
 
 CDoor* door;
+#define DOOR_RADIUS 16.0f
+#define DOOR_START_X 0.0f
+#define DOOR_START_Y -100.0f
 #define DOOR_SPRITE_HEIGHT 16.0f
 
+
+
+vector<CBrick*> questBricks;
 
 vector<CGlassBrick*> gbricks1;
 vector<CGlassBrick*> gbricks2;
@@ -92,6 +104,8 @@ vector<CCoin*> coins;
 vector<LPSPRITE> numbersRed;
 vector<LPSPRITE> numbersBlack;
 vector<LPSPRITE> stuff;
+
+
 int baseLifes = 10;
 int maxScore = 50;	//Do not set it over 999
 int score = -NUM_OF_COINS;
@@ -99,7 +113,11 @@ int lifes = maxScore / NUM_OF_COINS;
 //int victory = 0;	// -1: lose | 1: win
 int running = 1;	// 1: game running | 0: end game
 int pressSpaceBar = 0;
+int pressX = 0;
+int pressZ = 0;
 int numIndex[100];	//0-2 for score | 3-5 for maxScore | 6,7 for lifes
+int countDownStun = CLUBBA_STUN_TIME;
+int clubbaStuned = 0;
 
 
 //Check collide function
@@ -111,7 +129,7 @@ int CheckCollideObject(CGameObject* Obj1, CGameObject* Obj2)
 	return 0;
 }
 
-void CollideMarioCoin(CGameObject* mario, CGameObject* coin)
+void CollideMarioCoin(CMario* mario, CCoin* coin)
 {
 	float RandCoinSpawnX = (rand() % (SCREEN_WIDTH - 20) + 10);
 	int SpawnIndex = (rand() % 3);
@@ -123,7 +141,7 @@ void CollideMarioCoin(CGameObject* mario, CGameObject* coin)
 	}
 }
 
-void CollideMarioClubba(CGameObject* mario, CGameObject* clubba)
+void CollideMarioClubba(CMario* mario, CClubba* clubba)
 {
 	int SpawnIndex = (rand() % 3);
 
@@ -131,6 +149,16 @@ void CollideMarioClubba(CGameObject* mario, CGameObject* clubba)
 	{
 		mario->SetPosition(MARIO_START_X, RandMarioSpawnY[SpawnIndex]);
 		lifes--;
+	}
+}
+
+void CollideClubbaDoor(CClubba* clubba, CDoor* door)
+{
+	if (CheckCollideObject(clubba, door))
+	{
+		door->SetPosition(DOOR_START_X, DOOR_START_Y);
+		clubba->Stun();
+		clubbaStuned = 1;
 	}
 }
 
@@ -160,7 +188,20 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			pressSpaceBar = 1;
 			break;
 		}
-		pressSpaceBar = 0;
+
+		if (wParam == 0x58)
+		{
+			pressX = 1;
+			break;
+		}
+
+		if (wParam == 0x5A)
+		{
+			pressZ = 1;
+			break;
+		}
+
+		pressSpaceBar = pressX = pressZ = 0;
 		break;
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
@@ -284,25 +325,25 @@ void LoadResources()
 	CAnimationsFor2Stand* animations2 = CAnimationsFor2Stand::GetInstance();
 	LPANIMATION2STAND ani2;
 
-	sprites->Add(50001, 282, 99, 297, 114, texMisc);
-	sprites->Add(50011, 282, 117, 297, 132, texMisc);
+	sprites->Add(80001, 282, 99, 297, 114, texMisc);
+	sprites->Add(80011, 282, 117, 297, 132, texMisc);
 
-	sprites->Add(50002, 282, 135, 297, 150, texMisc);
-	sprites->Add(50012, 282, 153, 297, 168, texMisc);
+	sprites->Add(80002, 282, 135, 297, 150, texMisc);
+	sprites->Add(80012, 282, 153, 297, 168, texMisc);
 
-	sprites->Add(50003, 282, 171, 297, 186, texMisc);
-	sprites->Add(50013, 282, 189, 297, 204, texMisc);
+	sprites->Add(80003, 282, 171, 297, 186, texMisc);
+	sprites->Add(80013, 282, 189, 297, 204, texMisc);
 
-	sprites->Add(50004, 282, 207, 297, 222, texMisc);
-	sprites->Add(50014, 282, 225, 297, 240, texMisc);
+	sprites->Add(80004, 282, 207, 297, 222, texMisc);
+	sprites->Add(80014, 282, 225, 297, 240, texMisc);
 
 	ani2 = new CAnimationFor2Stand(100);
-	ani2->AddTop(50001, 50011, 1000);	//id1 , id2, time
-	ani2->AddTop(50002, 50012);
-	ani2->AddTop(50003, 50013 );
-	ani2->AddTop(50004, 50014, 500);
-	ani2->AddTop(50003, 50013);
-	ani2->AddTop(50002, 50012);
+	ani2->Add(80001, 80011, 1000);	//id1 , id2, time
+	ani2->Add(80002, 80012);
+	ani2->Add(80003, 80013 );
+	ani2->Add(80004, 80014, 500);
+	ani2->Add(80003, 80013);
+	ani2->Add(80002, 80012);
 	animations2->Add(100, ani2);
 
 	//Red numbers...
@@ -354,14 +395,21 @@ void LoadResources()
 		coins.push_back(new CCoin(COIN_START_X, COIN_START_Y, COIN_RADIUS));
 	}
 
+	//Question bricks for special skill...
+	nextBrickX = QSTBRICK_X;
+	for (int i = 0; i <= NUM_OF_SKILLS; i++)
+	{
+		questBricks.push_back(new CBrick(nextBrickX, QSTBRICK_Y, 0));
+		nextBrickX += QSTBRICK_WIDTH + DISTANCE_BW_SKILL;
+	}
+
+
 	
 
 	mario = new CMario(MARIO_START_X, MARIO_START_Y, MARIO_RADIUS, MARIO_START_VX);
-	//brick = new CBrick(100.0f, 100.0f, 0);
-	//gbrick = new CGlassBrick(200.0f, 100.0f, 0);
 	coinScore = new CCoin(10.0f, 10.0f, 0);
 	clubba = new CClubba(CLUBBA_START_X, CLUBBA_START_Y, 0, CLUBBA_START_VX);
-	//door = new CDoor(280.0f, 100.0f, DOOR_SPRITE_HEIGHT, 0);
+	door = new CDoor(DOOR_START_X, DOOR_START_Y, DOOR_RADIUS, DOOR_SPRITE_HEIGHT);
 }
 
 /*
@@ -384,6 +432,20 @@ void Update(DWORD dt)
 
 		clubba->Update(dt);
 		CollideMarioClubba(mario, clubba);
+
+		if (pressX)
+			door->SetPosition(mario->GetX(), mario->GetY() - 10);
+		pressX = 0;
+
+		CollideClubbaDoor(clubba, door);
+		if(!countDownStun)
+		{
+			countDownStun = CLUBBA_STUN_TIME;
+			clubba->BeBack();
+			clubbaStuned = 0;
+		}
+		if (clubbaStuned)
+			countDownStun--;
 
 		//Counting score
 		numIndex[0] = (score % 100) % 10;
@@ -433,9 +495,10 @@ void Render()
 
 		if(running)		
 		{
-			//brick->Render();
+			for (int i = 0; i < NUM_OF_SKILLS; i++)
+				questBricks[i]->Render();
 
-			//door->Render();
+			door->Render();
 
 			for (int i = 0; i < NUM_OF_BRICKS; i++)
 			{
